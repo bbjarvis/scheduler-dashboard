@@ -6,7 +6,16 @@ import Panel from "./Panel";
 
 class Dashboard extends Component {
   state = {
-    loading: false
+    loading: false,
+    focused: null
+  }
+
+  selectPanel(id) {
+
+    this.setState(prev => ({
+      focused: prev.focused !== null ? null : id
+    }));
+    
   }
 
   render() {
@@ -32,18 +41,25 @@ class Dashboard extends Component {
         value: "2.3"
       }
     ];
-    const panelData = data.map(panels => {
-      
-      return(
-        <Panel
-          key={panels.id}
-          id={panels.id}
-          label={panels.label}
-          value={panels.value}
-        />
+    const panelData = data
+      .filter(
+        panel => this.state.focused === null || this.state.focused === panel.id
       )
-    })
-    const dashboardClasses = classnames("dashboard");
+      .map(panel => {
+        
+        return(
+          <Panel
+            key={panel.id}
+            id={panel.id}
+            label={panel.label}
+            value={panel.value}
+            onSelect={event => this.selectPanel(panel.id)}
+          />
+        )
+      })
+    const dashboardClasses = classnames("dashboard", {
+      "dashboard--focused": this.state.focused
+    });
 
     if (this.state.loading) {
       return <Loading />;
